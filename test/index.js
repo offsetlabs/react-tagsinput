@@ -168,5 +168,19 @@ describe("TagsInput", function () {
       assert.equal(tagsinput.getTags().length, 1);
       assert.equal(tagsinput.getTags()[0], "test");
     });
+
+    it("should raise an excepction when adding a tag if the size of tags is greater than maxTags", function () {
+      var tagsinput = createTagsInput({maxTags: 1});
+      tagsinput.addTag("test");
+      assert.throws(function() {tagsinput.addTag("cannot-add");}, Error);
+    });
+
+    it("should not show the input if the size of tags is equal to maxTags", function () {
+      var tagsinput = createTagsInput({maxTags: 1});
+      tagsinput.addTag("test");
+
+      assert.equal(tagsinput.refs.input, null);
+    });
+
   });
 });
