@@ -59,6 +59,7 @@
         , onBlur: function () { }
         , classNamespace: "react"
         , addOnBlur: true
+        , maxTags: null
       };
     }
 
@@ -80,7 +81,15 @@
       return this.state.tags;
     }
 
+    , canAddTags: function () {
+      return this.props.maxTags === null || this.state.tags.length < this.props.maxTags;
+    }
+
     , addTag: function (tag, cb) {
+      if (!this.canAddTags()) {
+        throw new Error("Cannot add a tag beyond the maximum set by maxTags");
+      }
+
       var before = this.props.onBeforeTagAdd(tag);
       var valid =  !!before && this.props.validate(tag);
 
@@ -164,7 +173,9 @@
     }
 
     , inputFocus: function () {
-      this.refs.input.getDOMNode().focus();
+      if (this.refs.input) {
+        this.refs.input.getDOMNode().focus();
+      }
     }
 
     , render: function() {
@@ -179,19 +190,22 @@
         });
       }.bind(this));
 
+      var input = this.canAddTags() === false ? null :
+        React.createElement(Input, {
+        ref: "input"
+        , ns: ns
+        , placeholder: this.props.placeholder
+        , value: this.state.tag
+        , invalid: this.state.invalid
+        , onKeyDown: this.onKeyDown
+        , onChange: this.onChange
+        , onBlur: this.onBlur
+      });
+
       return (
         React.createElement("div", {
           className: ns + "tagsinput"
-        }, tagNodes, React.createElement(Input, {
-          ref: "input"
-          , ns: ns
-          , placeholder: this.props.placeholder
-          , value: this.state.tag
-          , invalid: this.state.invalid
-          , onKeyDown: this.onKeyDown
-          , onChange: this.onChange
-          , onBlur: this.onBlur
-        }))
+        }, tagNodes, input)
       );
     }
   });
