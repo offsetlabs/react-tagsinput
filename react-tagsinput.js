@@ -34,11 +34,19 @@
       return (
         React.createElement("span", {
           className: this.props.ns + "tagsinput-tag"
-        }, this.props.tag + " ", React.createElement("a", {
-          onClick: this.props.remove
-          , className: this.props.ns + "tagsinput-remove"
-        }))
+        }, this.props.tag + " ", this.renderRemoveButton())
       );
+    }
+
+    , renderRemoveButton: function() {
+      if (this.props.showRemoveButtons) {
+        return (
+          React.createElement("a", {
+            onClick: this.props.remove
+            , className: this.props.ns + "tagsinput-remove"
+          })
+        );
+      }
     }
   });
 
@@ -60,6 +68,7 @@
         , classNamespace: "react"
         , addOnBlur: true
         , maxTags: null
+        , showRemoveButtons: true
       };
     }
 
@@ -190,6 +199,7 @@
           , ns: ns
           , tag: tag
           , remove: this.removeTag.bind(null, tag)
+          , showRemoveButtons: this.props.showRemoveButtons
         });
       }.bind(this));
 
@@ -199,7 +209,7 @@
         }, tagNodes, React.createElement(Input, {
           ref: "input"
           , ns: ns
-          , placeholder: this.props.placeholder
+          , placeholder: this.state.tags.length === 0 ? this.props.placeholder : ""
           , value: this.state.tag
           , invalid: this.state.invalid
           , onKeyDown: this.onKeyDown
