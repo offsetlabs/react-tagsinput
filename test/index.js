@@ -175,11 +175,19 @@ describe("TagsInput", function () {
       assert.throws(function() {tagsinput.addTag("cannot-add");}, Error);
     });
 
-    it("should not show the input if the size of tags is equal to maxTags", function () {
+    it("should only allow backspace input if the size of tags is equal to maxTags", function () {
       var tagsinput = createTagsInput({maxTags: 1});
       tagsinput.addTag("test");
 
-      assert.equal(tagsinput.refs.input, null);
+      var input = TestUtils.findRenderedDOMComponentWithTag(tagsinput, "input");
+      TestUtils.Simulate.keyDown(input, { keyCode: 65 });
+
+      assert.equal(input.props.value, "");
+      assert.equal(tagsinput.getTags().length, 1);
+      assert.equal(tagsinput.getTags()[0], "test");
+
+      TestUtils.Simulate.keyDown(input, { keyCode: 8 });
+      assert.equal(tagsinput.getTags().length, 0);
     });
 
   });

@@ -86,7 +86,7 @@
     }
 
     , addTag: function (tag, cb) {
-      if (!this.canAddTags()) {
+      if (this.props.maxTags && this.state.tags.length === this.props.maxTags) {
         throw new Error("Cannot add a tag beyond the maximum set by maxTags");
       }
 
@@ -135,16 +135,21 @@
     }
 
     , onKeyDown: function (e) {
+
       var add = this.props.addKeys.indexOf(e.keyCode) !== -1
         , remove = this.props.removeKeys.indexOf(e.keyCode) !== -1;
 
-      if (add) {
+      if (add && this.canAddTags()) {
         e.preventDefault();
         this.addTag(this.state.tag.trim());
       }
 
       if (remove && this.state.tags.length > 0 && this.state.tag === "") {
         this.removeTag(this.state.tags[this.state.tags.length - 1]);
+      }
+
+      if (!this.canAddTags()) {
+        e.preventDefault();
       }
     }
 
@@ -173,9 +178,7 @@
     }
 
     , inputFocus: function () {
-      if (this.refs.input) {
-        this.refs.input.getDOMNode().focus();
-      }
+      this.refs.input.getDOMNode().focus();
     }
 
     , render: function() {
@@ -190,22 +193,19 @@
         });
       }.bind(this));
 
-      var input = this.canAddTags() === false ? null :
-        React.createElement(Input, {
-        ref: "input"
-        , ns: ns
-        , placeholder: this.props.placeholder
-        , value: this.state.tag
-        , invalid: this.state.invalid
-        , onKeyDown: this.onKeyDown
-        , onChange: this.onChange
-        , onBlur: this.onBlur
-      });
-
       return (
         React.createElement("div", {
           className: ns + "tagsinput"
-        }, tagNodes, input)
+        }, tagNodes, React.createElement(Input, {
+          ref: "input"
+          , ns: ns
+          , placeholder: this.props.placeholder
+          , value: this.state.tag
+          , invalid: this.state.invalid
+          , onKeyDown: this.onKeyDown
+          , onChange: this.onChange
+          , onBlur: this.onBlur
+        }))
       );
     }
   });
